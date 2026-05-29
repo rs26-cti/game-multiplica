@@ -26,9 +26,7 @@
             user-select: none;
         }
 
-body {
-            /* 1. Capa de respaldo: Tu imagen generada (Fondo principal si existe) */
-            /* 2. Capas de reserva: Si no encuentra tu imagen, carga el degradado y los símbolos de apoyo */
+        body {
             background-image: 
                 url("fondo_selva.jpg"), 
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M0,0 Q30,60 60,60 T120,120' stroke='%23ffffff' stroke-width='1.5' fill='none'/%3E%3Cpath d='M60,60 Q45,40 35,50 C25,60 45,70 60,60 Z' fill='%2399ffbb'/%3E%3C/svg%3E"),
@@ -36,7 +34,6 @@ body {
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Ccircle cx='30' cy='30' r='4' fill='%23ffffff'/%3E%3Ccircle cx='42' cy='25' r='3' fill='%23ffffff'/%3E%3Ccircle cx='20' cy='38' r='3' fill='%23ffffff'/%3E%3Ccircle cx='110' cy='110' r='4' fill='%23ffffff'/%3E%3Ccircle cx='122' cy='105' r='3' fill='%23ffffff'/%3E%3Ccircle cx='100' cy='118' r='3' fill='%23ffffff'/%3E%3C/svg%3E"),
                 linear-gradient(135deg, #1b4332 0%, #aaccff 100%);
             
-            /* Ajuste perfecto a la pantalla para todas las capas */
             background-position: center center, 0 0, 40px 40px, 80px 20px, 0 0;
             background-size: cover, 240px 240px, 300px 300px, 350px 350px, 100% 100%;
             background-repeat: no-repeat, repeat, repeat, repeat, no-repeat;
@@ -63,7 +60,6 @@ body {
             z-index: 0;
             pointer-events: none;
             opacity: 0.25;
-            /* Luces ambientales tipo bokeh que se fusionarán sobre tu imagen o sobre el fondo alternativo */
             background-image: 
                 radial-gradient(circle at 20% 30%, rgba(255,255,255,0.6) 0%, transparent 12%),
                 radial-gradient(circle at 75% 15%, rgba(255,255,255,0.5) 0%, transparent 15%),
@@ -79,7 +75,6 @@ body {
             z-index: 1;
         }
 
-        /* BARRA HUD INTEGRADA */
         .hud-bar {
             background: var(--verde-selva);
             color: white;
@@ -422,7 +417,6 @@ body {
             line-height: 1.3;
         }
 
-        /* ENTRADA INTELIGENTE POR CASILLAS (Unidades primero) */
         .grid-input-row {
             display: flex;
             justify-content: center;
@@ -461,7 +455,6 @@ body {
         }
         .dot.done { background: var(--primary); }
 
-        /* DISEÑO REFORMADO PARA LA TIENDA DE MASCOTAS 3D */
         .tienda-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -497,7 +490,6 @@ body {
             object-fit: cover;
             transition: all 0.3s ease;
         }
-        /* Aplica silueta negra/oscura si la mascota está bloqueada */
         .pet-locked {
             filter: brightness(0) opacity(0.75);
         }
@@ -506,6 +498,36 @@ body {
             color: var(--dark);
             margin-bottom: 8px;
             font-size: 1.05rem;
+        }
+
+        #gooey-screen {
+            background: transparent;
+            min-height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-radius: 18px;
+        }
+
+        #gooey-container {
+            position: relative;
+            filter: url(#threshold);
+            width: 100%;
+            height: 140px;
+        }
+
+        .gooey-text {
+            position: absolute;
+            font-size: 52px;
+            font-weight: bold;
+            color: var(--verde-selva);
+            white-space: nowrap;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            text-align: center;
         }
 
         .footer-brand {
@@ -520,8 +542,23 @@ body {
 </head>
 <body>
 
+<svg style="position:absolute; width:0; height:0;">
+    <defs>
+        <filter id="threshold">
+            <feColorMatrix
+                in="SourceGraphic"
+                type="matrix"
+                values="
+                1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 255 -140"
+            />
+        </filter>
+    </defs>
+</svg>
+
 <div id="game-outer">
-    <!-- BARRA HUD DE PROGRESO PERMANENTE -->
     <div class="hud-bar">
         <div class="hud-pet-container">
             <img id="hud-pet-icon" class="hud-pet-img" src="mascota_gecko.png" alt="Mascota activa">
@@ -541,9 +578,19 @@ body {
             <button class="btn-primary" onclick="saveName()">¡Continuar! ➡️</button>
         </div>
 
+        <!-- PANTALLA INTERMEDIO: EFECTO GOOEY -->
+        <div id="screen-gooey" class="screen">
+            <div id="gooey-screen">
+                <div id="gooey-container">
+                    <span id="text1" class="gooey-text"></span>
+                    <span id="text2" class="gooey-text"></span>
+                </div>
+            </div>
+        </div>
+
         <!-- PANTALLA 2: SELECCIÓN DE MODO -->
         <div id="screen-mode" class="screen">
-            <h1 id="welcome-message">¡Hola, Jugadora! 😊</h1>
+            <h1 id="welcome-message">¡Te damos la bienvenida! 😊</h1>
             <p>Elige cómo quieres practicar hoy:</p>
             
             <div class="mode-card" onclick="selectMode('adventure')">
@@ -597,7 +644,7 @@ body {
         <div id="screen-explanation" class="screen">
             <div class="exit-container" id="exit-btn-exp"><button class="btn-exit" onclick="triggerExit('screen-explanation')">🏠 Salir</button></div>
             <h2 style="color: var(--primary);">🍎 Explicación Paso a Paso</h2>
-            <p id="explanation-subtitle">¡Bien hecho! Mira cómo multiplicar números más grandes:</p>
+            <p id="explanation-subtitle">¡Gran trabajo! Mira cómo multiplicar números más grandes:</p>
             
             <div class="chalkboard">
                 <div id="chalk-instructions" class="chalk-text"></div>
@@ -664,7 +711,7 @@ body {
 
         <!-- PANTALLA 10: VICTORIA TOTAL -->
         <div id="screen-victory" class="screen">
-            <h1 style="color: var(--warning);" id="victory-title">🏆 ¡CAMPEONA DE LAS MULTIPLICACIONES! 👑</h1>
+            <h1 style="color: var(--warning);" id="victory-title">🏆 ¡ESTRELLA DE LAS MULTIPLICACIONES! 👑</h1>
             <p style="font-size:1.3rem;">¡Felicidades! Completaste todos los niveles con éxito.</p>
             <div style="font-size: 5rem; margin: 20px 0;">🎒✨🥇</div>
             <button class="btn-primary" onclick="resetToFirstLevel()">Jugar de Nuevo 🔄</button>
@@ -676,7 +723,7 @@ body {
 </div>
 
 <script>
-    let playerName = "Campeona";
+    let playerName = "Estrella";
     let gameMode = "adventure"; 
     let currentLevel = 1;
     let lives = 3;
@@ -685,10 +732,8 @@ body {
     let questions = [];
     let currentCorrectAnswer = 0;
     let canAnswer = true;
-
     let coins = 0;
     
-    // Mapeo directo a los nombres de tus archivos de imágenes
     const pets = [
         { name: "Gecko", file: "mascota_gecko.png", cost: 0, unlocked: true },
         { name: "Rana", file: "mascota_rana.png", cost: 50, unlocked: false },
@@ -705,11 +750,20 @@ body {
     let expCarry = 0;
     let expStep1Result = 0;
     let expFinalResult = 0;
-
     let practiceNumA = 0;
     let practiceNumB = 0;
     let practiceCorrectResult = 0;
     let previousScreenBeforeExit = "screen-mode";
+
+    let gooeyTextsArray = [];
+    let text1Element, text2Element;
+    let gooeyTextIndex = 0;
+    let gooeyMorph = 0;
+    let gooeyCooldown = 0.5; 
+    const gooeyMorphTime = 1.2; 
+    const gooeyCooldownTime = 0.5; 
+    let gooeyTime;
+    let gooeyAnimationId;
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
@@ -764,8 +818,94 @@ body {
         if (input.value.trim() !== "") {
             playerName = input.value.trim();
         }
+        
         document.getElementById('welcome-message').innerText = `¡Hola, ${playerName}! 😊`;
-        showScreen('screen-mode');
+        startGooeySequence();
+    }
+
+    function startGooeySequence() {
+        showScreen('screen-gooey');
+
+        // Secuencia completamente neutra que integra el nombre del usuario
+        gooeyTextsArray = [
+            "de CTI",
+            playerName,
+            "Te damos la bienvenida",
+            "A la Selva",
+            "Mágica 🌿"
+        ];
+
+        text1Element = document.getElementById("text1");
+        text2Element = document.getElementById("text2");
+
+        gooeyTextIndex = 0;
+        gooeyMorph = 0;
+        gooeyCooldown = gooeyCooldownTime;
+
+        text1Element.textContent = gooeyTextsArray[gooeyTextIndex];
+        text2Element.textContent = gooeyTextsArray[(gooeyTextIndex + 1) % gooeyTextsArray.length];
+        
+        gooeyTime = new Date();
+        animateGooey();
+    }
+
+    function setGooeyMorph(fraction) {
+        text2Element.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
+        text2Element.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
+
+        fraction = 1 - fraction;
+        text1Element.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
+        text1Element.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
+    }
+
+    function doGooeyCooldown() {
+        gooeyMorph = 0;
+        text2Element.style.filter = "";
+        text2Element.style.opacity = "100%";
+        text1Element.style.filter = "";
+        text1Element.style.opacity = "0%";
+    }
+
+    function doGooeyMorph() {
+        gooeyMorph -= gooeyCooldown;
+        gooeyCooldown = 0;
+        let fraction = gooeyMorph / gooeyMorphTime;
+
+        if (fraction > 1) {
+            gooeyCooldown = gooeyCooldownTime;
+            fraction = 1;
+        }
+        setGooeyMorph(fraction);
+    }
+
+    function animateGooey() {
+        gooeyAnimationId = requestAnimationFrame(animateGooey);
+
+        const newTime = new Date();
+        const shouldIncrementIndex = gooeyCooldown > 0;
+        const dt = (newTime.getTime() - gooeyTime.getTime()) / 1000;
+
+        gooeyTime = newTime;
+        gooeyCooldown -= dt;
+
+        if (gooeyCooldown <= 0) {
+            if (shouldIncrementIndex) {
+                if (gooeyTextIndex >= gooeyTextsArray.length - 1) {
+                    cancelAnimationFrame(gooeyAnimationId);
+                    setTimeout(() => {
+                        showScreen('screen-mode');
+                    }, 800);
+                    return;
+                }
+                gooeyTextIndex++;
+
+                text1Element.textContent = gooeyTextsArray[gooeyTextIndex];
+                text2Element.textContent = gooeyTextsArray[(gooeyTextIndex + 1) % gooeyTextsArray.length];
+            }
+            doGooeyMorph();
+        } else {
+            doGooeyCooldown();
+        }
     }
 
     function selectMode(mode) {
@@ -899,7 +1039,6 @@ body {
             
             coins += 2;
             document.getElementById('hud-coins').innerText = coins;
-
             currentQuestionIndex++;
 
             setTimeout(() => {
@@ -956,14 +1095,12 @@ body {
         expFinalResult = expNumA * expNumB;
 
         document.getElementById('exit-btn-exp').style.visibility = 'visible';
-
-        document.getElementById('chalk-instructions').innerHTML = `¡Hola ${playerName}! Vamos a aprender a hacer una multiplicación de varias cifras usando la tabla del <strong>${currentLevel}</strong>.<br><br>Presiona el botón amarillo para iniciar paso a paso.`;
+        document.getElementById('chalk-instructions').innerHTML = `¡Hola, ${playerName}! Vamos a aprender a hacer una multiplicación de varias cifras usando la tabla del <strong>${currentLevel}</strong>.<br><br>Presiona el botón amarillo para iniciar paso a paso.`;
         
         renderPizarraEstática();
         
         document.getElementById('vertical-math-result').innerText = '';
         document.getElementById('carry-display').innerText = '';
-        
         document.getElementById('explanation-next-btn').style.display = 'inline-flex';
         document.getElementById('explanation-action-btn').style.display = 'none';
 
@@ -989,7 +1126,6 @@ body {
         if (explanationStep === 1) {
             let multVal = units * expNumB;
             inst.innerHTML = `<strong>Paso 1:</strong> Multiplicamos las unidades.<br>Multiplicamos <span style="color: #F1C40F;">${units} × ${expNumB} = ${multVal}</span>.<br><br>Escribimos el <strong>${expStep1Result}</strong> abajo y "nos llevamos" <strong>${expCarry}</strong> arriba de las decenas.`;
-            
             problemDisp.innerHTML = `&nbsp;<span>${tens}</span><span class="highlight-num">${units}</span><br>x&nbsp;<span class="highlight-num">${expNumB}</span>`;
             
             if (expCarry > 0) {
@@ -1003,7 +1139,6 @@ body {
             let finalTenResult = multVal + expCarry;
             
             inst.innerHTML = `<strong>Paso 2:</strong> Multiplicamos las decenas.<br>Multiplicamos <span style="color: #F1C40F;">${tens} × ${expNumB} = ${multVal}</span>.<br><br>Ahora le sumamos lo que "llevábamos" arriba:<br>${multVal} + ${expCarry} (llevados) = <strong>${finalTenResult}</strong>.`;
-            
             carryDisp.innerHTML = `<span class="highlight-num">${expCarry}</span>`;
             problemDisp.innerHTML = `&nbsp;<span class="highlight-num">${tens}</span><span>${units}</span><br>x&nbsp;<span class="highlight-num">${expNumB}</span>`;
             
@@ -1015,7 +1150,7 @@ body {
             problemDisp.innerHTML = `&nbsp;<span>${tens}</span><span>${units}</span><br>x&nbsp;<span>${expNumB}</span>`;
             resultDisp.innerHTML = `<span>${expFinalResult}</span>`;
 
-            inst.innerHTML = `<strong>¡Listo!</strong> El resultado de <br><strong>${expNumA} × ${expNumB}</strong> es igual a <span style="font-size: 1.5rem; color:#FFD700;"><strong>${expFinalResult}</strong></span>.<br><br>¡Excelente! Ahora te toca resolver un ejercicio a ti sola.`;
+            inst.innerHTML = `<strong>¡Listo!</strong> El resultado de <br><strong>${expNumA} × ${expNumB}</strong> es igual a <span style="font-size: 1.5rem; color:#FFD700;"><strong>${expFinalResult}</strong></span>.<br><br>¡Excelente trabajo! Ahora te toca resolver un ejercicio de práctica.`;
             
             document.getElementById('explanation-next-btn').style.display = 'none';
             document.getElementById('explanation-action-btn').style.display = 'inline-flex';
@@ -1047,7 +1182,6 @@ body {
         }
 
         showScreen('screen-practice-exercise');
-        
         setTimeout(() => document.getElementById('d0').focus(), 150);
     }
 
@@ -1087,7 +1221,6 @@ body {
             if (gameMode === 'adventure') {
                 coins += 10;
                 document.getElementById('hud-coins').innerText = coins;
-
                 document.getElementById('win-level-title').innerText = `¡Excelente, ${playerName}! 🎉`;
                 document.getElementById('win-continue-btn').innerText = "Siguiente Nivel ➡️";
                 document.getElementById('win-continue-btn').onclick = nextLevel;
@@ -1095,18 +1228,15 @@ body {
             } else {
                 coins += 10;
                 document.getElementById('hud-coins').innerText = coins;
-
                 document.getElementById('win-level-title').innerText = `¡Lo lograste, ${playerName}! 🎉`;
                 const nextBtn = document.getElementById('win-continue-btn');
                 nextBtn.innerText = "Hacer otro ejercicio 📝";
-                nextBtn.onclick = function() {
-                    startSoloExercisesMode();
-                };
+                nextBtn.onclick = function() { startSoloExercisesMode(); };
                 showScreen('screen-win-level');
             }
         } else {
             playSound('incorrect');
-            alertBox.innerHTML = `❌ ¡Casi lo logras, ${playerName}! El resultado correcto era <strong>${practiceCorrectResult}</strong>.<br>¡No te preocupes! Vamos a intentar con otra operación para seguir mejorando. 💪`;
+            alertBox.innerHTML = `❌ ¡Casi lo logras, ${playerName}! El resultado correcto era <strong>${practiceCorrectResult}</strong>.<br>¡No hay problema! Vamos a intentar con otra operación para seguir mejorando. 💪`;
             alertBox.style.display = 'block';
             
             setTimeout(() => {
@@ -1115,7 +1245,6 @@ body {
         }
     }
 
-    // ACTUALIZACIÓN DE LA TIENDA CON TUS IMÁGENES REALES
     function showShop() {
         document.getElementById('shop-alert').style.display = "none";
         const grid = document.getElementById('shop-grid');
@@ -1127,12 +1256,10 @@ body {
             let card = document.createElement('div');
             card.className = "pet-card";
 
-            // Nombre arriba de la foto
             let nameLbl = document.createElement('div');
             nameLbl.className = "pet-name-label";
             nameLbl.innerText = pet.name;
 
-            // Contenedor circular e imagen
             let frame = document.createElement('div');
             frame.className = "pet-avatar-frame";
             
@@ -1142,11 +1269,10 @@ body {
             img.className = "pet-img";
             
             if (!pet.unlocked) {
-                img.classList.add('pet-locked'); // Efecto silueta si está bloqueado
+                img.classList.add('pet-locked');
             }
             frame.appendChild(img);
 
-            // Botón de acción
             let btn = document.createElement('button');
             btn.style = "width: 100%; font-size: 0.9rem; margin: 5px 0; padding: 8px;";
 
@@ -1182,7 +1308,6 @@ body {
         coins -= pets[index].cost;
         pets[index].unlocked = true;
         document.getElementById('hud-coins').innerText = coins;
-
         playSound('shop');
         
         const alertBox = document.getElementById('shop-alert');
@@ -1194,7 +1319,6 @@ body {
     }
 
     function equipPet(index) {
-        // Actualiza tanto el texto como la imagen en el HUD superior
         document.getElementById('hud-pet-name').innerText = "Mascota: " + pets[index].name;
         document.getElementById('hud-pet-icon').src = pets[index].file;
     }
@@ -1204,7 +1328,7 @@ body {
             currentLevel++;
             showLevelIntroduction();
         } else {
-            document.getElementById('victory-title').innerText = `🏆 ¡CAMPEONA DE LAS MULTIPLICACIONES, ${playerName}! 👑`;
+            document.getElementById('victory-title').innerText = `🏆 ¡ESTRELLA DE LAS MULTIPLICACIONES, ${playerName}! 👑`;
             showScreen('screen-victory');
         }
     }
