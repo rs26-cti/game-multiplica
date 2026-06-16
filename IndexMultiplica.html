@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multiplica con CTI - ¡Selva Mágica!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --primary: #4A90E2;
@@ -33,12 +34,10 @@
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ctext x='20' y='50' font-family='Arial' font-size='32' font-weight='bold' fill='%23ffffff'%3E+%3C/text%3E%3Ctext x='140' y='70' font-family='Arial' font-size='28' font-weight='bold' fill='%23ffffff'%3E%C3%97%3C/text%3E%3Ctext x='80' y='160' font-family='Arial' font-size='30' font-weight='bold' fill='%23ffffff'%3E=%3C/text%3E%3C/svg%3E"),
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Ccircle cx='30' cy='30' r='4' fill='%23ffffff'/%3E%3Ccircle cx='42' cy='25' r='3' fill='%23ffffff'/%3E%3Ccircle cx='20' cy='38' r='3' fill='%23ffffff'/%3E%3Ccircle cx='110' cy='110' r='4' fill='%23ffffff'/%3E%3Ccircle cx='122' cy='105' r='3' fill='%23ffffff'/%3E%3Ccircle cx='100' cy='118' r='3' fill='%23ffffff'/%3E%3C/svg%3E"),
                 linear-gradient(135deg, #1b4332 0%, #aaccff 100%);
-            
             background-position: center center, 0 0, 40px 40px, 80px 20px, 0 0;
             background-size: cover, 240px 240px, 300px 300px, 350px 350px, 100% 100%;
             background-repeat: no-repeat, repeat, repeat, repeat, no-repeat;
             background-attachment: fixed;
-            
             margin: 0;
             padding: 10px;
             display: flex;
@@ -50,29 +49,12 @@
             overflow-x: hidden;
         }
 
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.25;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.6) 0%, transparent 12%),
-                radial-gradient(circle at 75% 15%, rgba(255,255,255,0.5) 0%, transparent 15%),
-                radial-gradient(circle at 85% 75%, rgba(255,255,255,0.6) 0%, transparent 10%),
-                radial-gradient(circle at 40% 85%, rgba(255,255,255,0.4) 0%, transparent 18%);
-            filter: blur(2.5px);
-        }
-
         #game-outer {
             width: 100%;
             max-width: 650px;
             position: relative;
             z-index: 1;
+            margin-bottom: 75px; 
         }
 
         .hud-bar {
@@ -97,7 +79,7 @@
         .hud-pet-img {
             width: 32px;
             height: 32px;
-            object-fit: contain;
+            object-fit: cover;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.2);
             padding: 2px;
@@ -163,55 +145,18 @@
             transform: translateY(4px);
         }
 
-        button.btn-primary { 
-            background-color: var(--primary); 
-            box-shadow: 0 6px var(--primary-dark); 
-        }
-        button.btn-primary:active { 
-            box-shadow: 0 2px var(--primary-dark); 
-        }
+        button.btn-primary { background-color: var(--primary); box-shadow: 0 6px var(--primary-dark); }
+        button.btn-primary:active { box-shadow: 0 2px var(--primary-dark); }
+        button.btn-warning { background-color: var(--warning); color: var(--dark); box-shadow: 0 6px #D68910; }
+        button.btn-warning:active { box-shadow: 0 2px #D68910; }
+        button.btn-danger { background-color: var(--danger); box-shadow: 0 6px var(--danger-dark); }
+        button.btn-danger:active { box-shadow: 0 2px var(--danger-dark); }
+        button.btn-secondary { background-color: #7f8c8d; box-shadow: 0 6px #5d6d7e; }
+        button.btn-secondary:active { box-shadow: 0 2px #5d6d7e; }
 
-        button.btn-warning {
-            background-color: var(--warning);
-            color: var(--dark);
-            box-shadow: 0 6px #D68910;
-        }
-        button.btn-warning:active {
-            box-shadow: 0 2px #D68910;
-        }
-
-        button.btn-danger {
-            background-color: var(--danger);
-            box-shadow: 0 6px var(--danger-dark);
-        }
-        button.btn-danger:active {
-            box-shadow: 0 2px var(--danger-dark);
-        }
-
-        button.btn-secondary {
-            background-color: #7f8c8d;
-            box-shadow: 0 6px #5d6d7e;
-        }
-        button.btn-secondary:active {
-            box-shadow: 0 2px #5d6d7e;
-        }
-
-        .exit-container {
-            display: flex;
-            justify-content: flex-start;
-            margin-bottom: 10px;
-        }
-        .btn-exit {
-            background: #94a3b8;
-            font-size: 0.9rem;
-            padding: 6px 15px;
-            box-shadow: 0 3px #64748b;
-            margin: 0;
-        }
-        .btn-exit:active {
-            box-shadow: 0 1px #64748b;
-            transform: translateY(2px);
-        }
+        .exit-container { display: flex; justify-content: flex-start; margin-bottom: 10px; }
+        .btn-exit { background: #94a3b8; font-size: 0.9rem; padding: 6px 15px; box-shadow: 0 3px #64748b; margin: 0; }
+        .btn-exit:active { box-shadow: 0 1px #64748b; transform: translateY(2px); }
 
         .status-bar {
             display: flex;
@@ -236,7 +181,6 @@
             margin: 15px 0;
             text-align: center;
             outline: none;
-            transition: border-color 0.2s;
         }
         input[type="text"] { width: 80%; }
 
@@ -249,11 +193,7 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .mode-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            background: #f0fdf4;
-        }
+        .mode-card:hover { border-color: var(--primary); background: #f0fdf4; }
 
         .study-table {
             display: grid;
@@ -272,27 +212,13 @@
             padding: 6px;
             background: white;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             color: var(--dark);
         }
 
-        .operation {
-            font-size: 3.8rem;
-            font-weight: bold;
-            margin: 25px 0;
-            color: var(--dark);
-            text-shadow: 2px 2px 0px #cbd5e1;
-            letter-spacing: 2px;
-        }
+        .operation { font-size: 3.8rem; font-weight: bold; margin: 25px 0; color: var(--dark); letter-spacing: 2px; text-shadow: 2px 2px 0px #cbd5e1; }
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
 
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .options-btn {
+        .option-btn {
             background-color: white;
             color: var(--dark);
             border: 3px solid #cbd5e1;
@@ -300,21 +226,12 @@
             font-size: 1.6rem;
             padding: 15px;
             border-radius: 15px;
+            cursor: pointer;
         }
-        .options-btn:hover { background-color: #f8fafc; }
+        .option-btn:hover { background-color: #f8fafc; }
 
-        .correct { 
-            background-color: var(--success) !important; 
-            color: white !important; 
-            border-color: var(--success) !important; 
-            box-shadow: 0 5px var(--success-dark) !important;
-        }
-        .incorrect { 
-            background-color: var(--danger) !important; 
-            color: white !important; 
-            border-color: var(--danger) !important; 
-            box-shadow: 0 5px var(--danger-dark) !important;
-        }
+        .correct { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 5px var(--success-dark) !important;}
+        .incorrect { background-color: var(--danger) !important; color: white !important; border-color: var(--danger) !important; box-shadow: 0 5px var(--danger-dark) !important;}
 
         .chalkboard {
             background-color: var(--board-bg);
@@ -325,49 +242,15 @@
             font-family: 'Courier New', Courier, monospace;
             text-align: left;
             margin: 20px 0;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
             min-height: 250px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        .chalk-text {
-            font-size: 1.15rem;
-            line-height: 1.4;
-            color: #FFFFE0;
-            margin-bottom: 10px;
-        }
-
-        .math-vertical {
-            font-size: 2.5rem;
-            width: 160px;
-            margin: 15px auto;
-            text-align: right;
-            border-bottom: 4px solid white;
-            padding-right: 20px;
-            letter-spacing: 6px;
-            line-height: 1.3;
-            position: relative;
-        }
-
-        .carry-number {
-            font-size: 1.3rem;
-            color: #FF8C00;
-            position: absolute;
-            top: -24px;
-            right: 50px;
-        }
-
-        .math-result {
-            font-size: 2.5rem;
-            width: 160px;
-            margin: 5px auto;
-            text-align: right;
-            padding-right: 20px;
-            letter-spacing: 6px;
-            color: #5DADE2;
-            line-height: 1;
-        }
-
+        .chalk-text { font-size: 1.15rem; line-height: 1.4; color: #FFFFE0; }
+        .math-vertical { font-size: 2.5rem; width: 160px; margin: 15px auto; text-align: right; border-bottom: 4px solid white; letter-spacing: 6px; position: relative; padding-right: 20px; line-height: 1.3; }
+        .carry-number { font-size: 1.3rem; color: #FF8C00; position: absolute; top: -24px; right: 50px; }
+        .math-result { font-size: 2.5rem; width: 160px; margin: 5px auto; text-align: right; letter-spacing: 6px; color: #5DADE2; padding-right: 20px; line-height: 1; }
+        
         .highlight-num {
             color: #F1C40F;
             display: inline-block;
@@ -381,163 +264,157 @@
             to { transform: scale(1.2); }
         }
 
-        .inline-alert {
-            background-color: #FADBD8;
-            border: 2px solid var(--danger);
-            border-radius: 12px;
-            padding: 15px;
-            color: var(--danger-dark);
-            font-weight: bold;
-            margin: 15px 0;
-            display: none;
-            animation: shake 0.4s ease-in-out;
-        }
-
-        .alert-success-inline {
-            background-color: #def7ec;
-            border: 2px solid var(--success);
-            color: #03543f;
-        }
-
+        .inline-alert { background-color: #FADBD8; border: 2px solid var(--danger); border-radius: 12px; padding: 15px; color: var(--danger-dark); font-weight: bold; margin: 15px 0; display: none; animation: shake 0.4s ease-in-out; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-6px); }
             40%, 80% { transform: translateX(6px); }
         }
 
-        .vertical-layout {
-            display: inline-block;
-            text-align: right;
-            font-size: 2.5rem;
-            font-weight: bold;
-            border-bottom: 4px solid var(--dark);
-            padding-right: 15px;
-            letter-spacing: 5px;
-            width: 140px;
-            line-height: 1.3;
-        }
+        .vertical-layout { display: inline-block; text-align: right; font-size: 2.5rem; font-weight: bold; border-bottom: 4px solid var(--dark); width: 140px; letter-spacing: 5px; padding-right: 15px; line-height: 1.3; }
+        .grid-input-row { display: flex; justify-content: center; gap: 8px; margin: 15px 0; direction: rtl; }
+        .digit-box { width: 75px; height: 65px; font-size: 2.2rem; text-align: center; border: 3px solid var(--primary); border-radius: 10px; font-weight: bold; outline: none; }
 
-        .grid-input-row {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin: 15px 0;
-            direction: rtl;
-        }
-
-        .digit-box {
-            width: 75px;
-            height: 65px;
-            font-size: 2.2rem;
-            text-align: center;
-            border: 3px solid var(--primary);
-            border-radius: 10px;
-            font-weight: bold;
-            outline: none;
-            padding: 0;
-        }
-        .digit-box:focus {
-            border-color: var(--success);
-            background: #f0fdf4;
-        }
-
-        .progress-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 15px;
-        }
-        .dot {
-            width: 12px;
-            height: 12px;
-            background: #cbd5e1;
-            border-radius: 50%;
-        }
+        .progress-dots { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
+        .dot { width: 12px; height: 12px; background: #cbd5e1; border-radius: 50%; }
         .dot.done { background: var(--primary); }
 
-        .tienda-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
+        .tienda-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+        .pet-card { border: 3px solid #e2e8f0; border-radius: 18px; padding: 15px; background: var(--light); display: flex; flex-direction: column; align-items: center; }
+        .pet-avatar-frame { width: 85px; height: 85px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 8px; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .pet-img { width: 100%; height: 100%; object-fit: cover; }
+        .pet-locked { filter: brightness(0) opacity(0.75); }
+        .pet-name-label { font-weight: bold; color: var(--dark); margin-bottom: 8px; }
+
+        .modal-recompensa-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
         }
-        .pet-card {
-            border: 3px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 15px;
-            background: var(--light);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .modal-recompensa-overlay.mostrar { opacity: 1; pointer-events: auto; }
+        
+        .tarjeta-premio {
+            background: white;
+            border: 6px solid var(--oro);
+            border-radius: 24px;
+            padding: 30px;
+            width: 90%; max-width: 420px;
+            text-align: center;
+            box-shadow: 0 0 35px var(--oro);
+            transform: scale(0.6);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-recompensa-overlay.mostrar .tarjeta-premio { transform: scale(1); }
+        
+        .marco-avatar-premio {
+            width: 160px; 
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 40%, #ffefa6 100%);
+            margin: 20px auto;
+            display: flex; align-items: center; justify-content: center;
+            border: 5px solid var(--oro);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            overflow: hidden; 
             position: relative;
         }
-        .pet-avatar-frame {
-            width: 85px;
-            height: 85px;
-            border-radius: 50%;
-            background: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 8px;
-            border: 3px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        }
-        .pet-img {
+        .img-premio {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: all 0.3s ease;
-        }
-        .pet-locked {
-            filter: brightness(0) opacity(0.75);
-        }
-        .pet-name-label {
-            font-weight: bold;
-            color: var(--dark);
-            margin-bottom: 8px;
-            font-size: 1.05rem;
+            object-fit: cover; 
         }
 
-        #gooey-screen {
-            background: transparent;
-            min-height: 350px;
+        #asistente-mascota-container {
+            position: fixed;
+            bottom: 15px;
+            right: 20px;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            z-index: 500;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            opacity: 0; 
+        }
+        #asistente-mascota-container.visible { opacity: 1; pointer-events: auto; }
+        
+        .burbuja-dialogo {
+            background: white;
+            border: 3px solid var(--primary);
+            border-radius: 16px;
+            padding: 12px 16px;
+            max-width: 240px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            font-size: 0.95rem;
+            font-weight: 500;
+            position: relative;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+        .burbuja-dialogo::after {
+            content: '';
+            position: absolute;
+            right: -12px; bottom: 20px;
+            border-width: 8px 0 8px 12px;
+            border-style: solid;
+            border-color: transparent transparent transparent white;
+        }
+        .burbuja-dialogo::before {
+            content: '';
+            position: absolute;
+            right: -16px; bottom: 18px;
+            border-width: 10px 0 10px 14px;
+            border-style: solid;
+            border-color: transparent transparent transparent var(--primary);
+            z-index: -1;
+        }
+        .avatar-asistente {
+            width: 75px; height: 75px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        .avatar-asistente img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* REESTRUCTURACIÓN Y CORRECCIÓN TOTAL DE LA ALINEACIÓN DEL EFECTO GOOEY */
+        #gooey-screen { 
+            background: transparent; 
+            min-height: 250px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative; 
+            width: 100%;
+        }
+        #gooey-container { 
+            position: relative; 
+            filter: url(#threshold); 
+            width: 100%; 
+            height: 120px; 
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            border-radius: 18px;
         }
-
-        #gooey-container {
-            position: relative;
-            filter: url(#threshold);
-            width: 100%;
-            height: 140px;
+        .gooey-text { 
+            position: absolute; 
+            font-size: 42px; 
+            font-weight: bold; 
+            color: var(--verde-selva); 
+            width: 100%; 
+            text-align: center; 
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            display: inline-block;
         }
-
-        .gooey-text {
-            position: absolute;
-            font-size: 52px;
-            font-weight: bold;
-            color: var(--verde-selva);
-            white-space: nowrap;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            text-align: center;
-        }
-
-        .footer-brand {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            margin-top: 15px;
-            text-align: center;
-            font-style: italic;
-            letter-spacing: 1px;
-        }
+        .footer-brand { font-size: 0.8rem; color: #94a3b8; margin-top: 15px; text-align: center; font-style: italic; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -545,18 +422,36 @@
 <svg style="position:absolute; width:0; height:0;">
     <defs>
         <filter id="threshold">
-            <feColorMatrix
-                in="SourceGraphic"
-                type="matrix"
-                values="
-                1 0 0 0 0
-                0 1 0 0 0
-                0 0 1 0 0
-                0 0 0 255 -140"
-            />
+            <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 255 -140"/>
         </filter>
     </defs>
 </svg>
+
+<div id="modal-premio-mascota" class="modal-recompensa-overlay">
+    <div class="tarjeta-premio" id="sub-pantalla-recompensa">
+        <h2>¡NUEVO COMPAÑERO!</h2>
+        <p id="modal-premio-sub"></p>
+        <div class="marco-avatar-premio">
+            <img id="modal-premio-img" src="" class="img-premio" alt="Premio Obtenido">
+        </div>
+        <button class="btn-success" style="margin-top: 10px; width: 80%;" onclick="pasarABautizo()">¡Genial, gracias! 🐾</button>
+    </div>
+
+    <div class="tarjeta-premio" id="sub-pantalla-bautizo" style="display: none;">
+        <h2>¿Cómo se llamará? ✨</h2>
+        <p>¡Dale un nombre especial a tu nuevo compañero de equipo!</p>
+        <input type="text" id="input-nombre-mascota" placeholder="Escribe el nombre aquí..." maxlength="12" autocomplete="off">
+        <br>
+        <button class="btn-primary" style="margin-top: 10px; width: 80%;" onclick="guardarNombreMascota()">Guardar Nombre 💾</button>
+    </div>
+</div>
+
+<div id="asistente-mascota-container">
+    <div class="burbuja-dialogo" id="burbuja-texto-asistente">¡Vamos a resolverlo juntos!</div>
+    <div class="avatar-asistente" onclick="reaccionarAClicMascota()">
+        <img id="img-asistente-actual" src="mascota_gecko.png" alt="Ayudante">
+    </div>
+</div>
 
 <div id="game-outer">
     <div class="hud-bar">
@@ -568,8 +463,6 @@
     </div>
 
     <div id="game-container">
-        
-        <!-- PANTALLA 1: REGISTRO DE NOMBRE -->
         <div id="screen-name" class="screen active">
             <h1>¡Aventuras Matemáticas! 🚀</h1>
             <p>¡Hola! ¿Cómo te llamas? Escribe tu nombre para empezar:</p>
@@ -578,7 +471,6 @@
             <button class="btn-primary" onclick="saveName()">¡Continuar! ➡️</button>
         </div>
 
-        <!-- PANTALLA INTERMEDIO: EFECTO GOOEY -->
         <div id="screen-gooey" class="screen">
             <div id="gooey-screen">
                 <div id="gooey-container">
@@ -588,87 +480,69 @@
             </div>
         </div>
 
-        <!-- PANTALLA 2: SELECCIÓN DE MODO -->
         <div id="screen-mode" class="screen">
             <h1 id="welcome-message">¡Te damos la bienvenida! 😊</h1>
             <p>Elige cómo quieres practicar hoy:</p>
-            
             <div class="mode-card" onclick="selectMode('adventure')">
                 <h3 style="margin: 0; color: var(--success); font-size: 1.4rem;">🌈 Modo Aventura</h3>
                 <p style="margin: 5px 0 0 0; font-size: 1rem;">Estudia las tablas paso a paso (del 1 al 10), resuelve desafíos y gana copas.</p>
             </div>
-
             <div class="mode-card" onclick="selectMode('exercises')">
-                <h3 style="margin: 0; color: var(--primary); font-size: 1.4rem;">⚡ Solo Ejercicios (Multi-Cifra)</h3>
+                <h3 style="margin: 0; color: var(--primary); font-size: 1.4rem;">⚡ Solo Ejercicios</h3>
                 <p style="margin: 5px 0 0 0; font-size: 1rem;">Pon a prueba tu agilidad resolviendo multiplicaciones directo por casillas.</p>
             </div>
-
             <div class="mode-card" onclick="showShop()" style="border-color: var(--warning);">
                 <h3 style="margin: 0; color: #D68910; font-size: 1.4rem;">🛒 Tienda de Mascotas Mágicas</h3>
                 <p style="margin: 5px 0 0 0; font-size: 1rem;">¡Usa tus monedas ganadas para desbloquear increíbles compañeros de selva!</p>
             </div>
         </div>
 
-        <!-- PANTALLA: CONFIRMACIÓN DE SALIDA -->
         <div id="screen-confirm-exit" class="screen">
             <h2 style="color: var(--danger);">¿Seguro que quieres salir? 🚪</h2>
             <p>Si sales al menú principal perderás el progreso del nivel actual.</p>
-            <div style="font-size: 4rem; margin: 15px 0;">🤔</div>
             <button class="btn-danger" onclick="confirmExit(true)">Sí, salir al menú</button>
             <button class="btn-secondary" onclick="confirmExit(false)">No, seguir jugando</button>
         </div>
 
-        <!-- PANTALLA 3: APRENDIZAJE -->
         <div id="screen-learn" class="screen">
             <div class="exit-container"><button class="btn-exit" onclick="triggerExit('screen-learn')">🏠 Salir</button></div>
             <h2 id="learn-title">Nivel X: Repasemos la Tabla</h2>
-            <p>Estudia bien esta tabla antes de comenzar el examen del nivel:</p>
             <div id="study-table-container" class="study-table"></div>
             <button class="btn-primary" onclick="startQuiz()">¡Listo, a jugar! 🎮</button>
         </div>
 
-        <!-- PANTALLA 4: EXAMEN (QUIZ) -->
         <div id="screen-quiz" class="screen">
             <div class="exit-container"><button class="btn-exit" onclick="triggerExit('screen-quiz')">🏠 Salir</button></div>
             <div class="status-bar">
                 <div id="info-level">Nivel 1</div>
                 <div id="info-lives" class="hearts">❤️❤️❤️</div>
             </div>
-            <p style="font-size: 1.1rem; color: #64748b; margin-bottom: 5px;">Selecciona la respuesta correcta:</p>
             <div id="current-operation" class="operation">1 x 1 = ?</div>
             <div class="options-grid" id="options-container"></div>
             <div class="progress-dots" id="progress-container"></div>
         </div>
 
-        <!-- PANTALLA 5: EXPLICADOR PASO A PASO -->
         <div id="screen-explanation" class="screen">
             <div class="exit-container" id="exit-btn-exp"><button class="btn-exit" onclick="triggerExit('screen-explanation')">🏠 Salir</button></div>
             <h2 style="color: var(--primary);">🍎 Explicación Paso a Paso</h2>
-            <p id="explanation-subtitle">¡Gran trabajo! Mira cómo multiplicar números más grandes:</p>
-            
             <div class="chalkboard">
                 <div id="chalk-instructions" class="chalk-text"></div>
-                
                 <div style="position: relative; width: max-content; margin: 0 auto;">
                     <div id="carry-display" class="carry-number"></div>
                     <div id="vertical-math-problem" class="math-vertical"></div>
                 </div>
                 <div id="vertical-math-result" class="math-result"></div>
             </div>
-
             <button id="explanation-next-btn" class="btn-warning" onclick="advanceExplanation()">Siguiente paso 🔍</button>
             <button id="explanation-action-btn" class="btn-success" style="display: none;" onclick="goToPracticeExercise()">¡Poner en práctica! 📝</button>
         </div>
 
-        <!-- PANTALLA 6: EJERCICIO PRÁCTICO EN VERTICAL -->
         <div id="screen-practice-exercise" class="screen">
             <div class="exit-container" id="exit-btn-practice"><button class="btn-exit" onclick="triggerExit('screen-practice-exercise')">🏠 Salir</button></div>
             <h2 style="color: var(--primary);">📝 ¡Tu turno de resolver!</h2>
             <p>Escribe el resultado de derecha a izquierda (¡Unidades primero!):</p>
-            
             <div style="margin: 20px 0; background: #f1f5f9; padding: 20px; border-radius: 18px; display: inline-block; border: 2px solid #cbd5e1;">
                 <div class="vertical-layout" id="practice-layout" style="border-bottom: 4px solid var(--dark); margin-bottom: 10px;"></div>
-                
                 <div class="grid-input-row">
                     <input type="number" id="d0" class="digit-box" oninput="moveFocusLeft(0)" placeholder="?">
                     <input type="number" id="d1" class="digit-box" oninput="moveFocusLeft(1)" placeholder="-">
@@ -676,44 +550,30 @@
                     <input type="number" id="d3" class="digit-box" oninput="moveFocusLeft(3)" placeholder="-">
                 </div>
             </div>
-
             <div id="practice-error-alert" class="inline-alert"></div>
-
             <br>
             <button class="btn-success" onclick="checkPracticeExercise()">Comprobar Respuesta ✔️</button>
         </div>
 
-        <!-- PANTALLA 7: TIENDA DE MASCOTAS -->
         <div id="screen-shop" class="screen">
             <div class="exit-container"><button class="btn-exit" onclick="goToMenu()">🏠 Menú</button></div>
             <h2>🛒 Tienda de Mascotas de la Selva</h2>
-            <p>¡Desbloquea las 7 mascotas en orden secuencial!</p>
-            <div id="shop-alert" class="inline-alert alert-success-inline"></div>
             <div id="shop-grid" class="tienda-grid"></div>
         </div>
 
-        <!-- PANTALLA 8: NIVEL COMPLETADO -->
         <div id="screen-win-level" class="screen">
             <h2 style="color: var(--success);" id="win-level-title">¡Excelente! 🎉</h2>
-            <p style="font-size:1.2rem;">¡Has completado y dominado el nivel!</p>
-            <div style="font-size: 4.5rem; margin: 15px 0;">🏆</div>
             <button id="win-continue-btn" class="btn-primary" onclick="nextLevel()">Siguiente Nivel ➡️</button>
         </div>
 
-        <!-- PANTALLA 9: JUEGO TERMINADO -->
         <div id="screen-game-over" class="screen">
             <h2 style="color: var(--danger);" id="game-over-title">¡Inténtalo de nuevo! 💪</h2>
-            <p>Se te acabaron las vidas en este nivel, pero no te preocupes.</p>
-            <div style="font-size: 4rem; margin: 15px 0;">💔</div>
-            <p>Volverás a empezar este nivel con preguntas completamente nuevas.</p>
+            <p>Se te acabaron las vidas en este nivel, volverás a empezar con preguntas completamente nuevas.</p>
             <button class="btn-primary" onclick="retryLevel()">Repasar y Volver a Intentar 🔄</button>
         </div>
 
-        <!-- PANTALLA 10: VICTORIA TOTAL -->
         <div id="screen-victory" class="screen">
             <h1 style="color: var(--warning);" id="victory-title">🏆 ¡ESTRELLA DE LAS MULTIPLICACIONES! 👑</h1>
-            <p style="font-size:1.3rem;">¡Felicidades! Completaste todos los niveles con éxito.</p>
-            <div style="font-size: 5rem; margin: 20px 0;">🎒✨🥇</div>
             <button class="btn-primary" onclick="resetToFirstLevel()">Jugar de Nuevo 🔄</button>
             <button class="btn-secondary" onclick="goToMenu()">Ir al Menú Principal 🏠</button>
         </div>
@@ -733,213 +593,228 @@
     let currentCorrectAnswer = 0;
     let canAnswer = true;
     let coins = 0;
+    let mascotaEquipadaIndex = 0;
     
     const pets = [
-        { name: "Gecko", file: "mascota_gecko.png", cost: 0, unlocked: true },
-        { name: "Rana", file: "mascota_rana.png", cost: 50, unlocked: false },
-        { name: "Gato", file: "mascota_gato.png", cost: 100, unlocked: false },
-        { name: "Perro", file: "mascota_perro.png", cost: 150, unlocked: false },
-        { name: "Mono", file: "mascota_mono.png", cost: 200, unlocked: false },
-        { name: "Tucán", file: "mascota_tucan.png", cost: 250, unlocked: false },
-        { name: "Tigre", file: "mascota_tigre.png", cost: 350, unlocked: false }
+        { name: "Gecko", file: "mascota_gecko.png", cost: 0, unlocked: true, customName: "" },
+        { name: "Rana", file: "mascota_rana.png", cost: 50, unlocked: false, customName: "" },
+        { name: "Gato", file: "mascota_gato.png", cost: 100, unlocked: false, customName: "" },
+        { name: "Perro", file: "mascota_perro.png", cost: 150, unlocked: false, customName: "" },
+        { name: "Mono", file: "mascota_mono.png", cost: 200, unlocked: false, customName: "" },
+        { name: "Tucán", file: "mascota_tucan.png", cost: 250, unlocked: false, customName: "" },
+        { name: "Tigre", file: "mascota_tigre.png", cost: 350, unlocked: false, customName: "" }
     ];
 
+    let indiceMascotaRecienComprada = null;
+
     let explanationStep = 0;
-    let expNumA = 24; 
-    let expNumB = 3;  
-    let expCarry = 0;
-    let expStep1Result = 0;
-    let expFinalResult = 0;
-    let practiceNumA = 0;
-    let practiceNumB = 0;
-    let practiceCorrectResult = 0;
+    let expNumA = 24, expNumB = 3, expCarry = 0, expStep1Result = 0, expFinalResult = 0;
+    let practiceNumA = 0, practiceNumB = 0, practiceCorrectResult = 0;
     let previousScreenBeforeExit = "screen-mode";
 
-    let gooeyTextsArray = [];
-    let text1Element, text2Element;
-    let gooeyTextIndex = 0;
-    let gooeyMorph = 0;
-    let gooeyCooldown = 0.5; 
-    const gooeyMorphTime = 1.2; 
-    const gooeyCooldownTime = 0.5; 
-    let gooeyTime;
-    let gooeyAnimationId;
+    let gooeyTextsArray = [], text1Element, text2Element, gooeyTextIndex = 0, gooeyMorph = 0, gooeyCooldown = 0.5;
+    const gooeyMorphTime = 1.2, gooeyCooldownTime = 0.5;
+    let gooeyTime, gooeyAnimationId;
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
+
+    const frasesFelicidad = [
+        "¡Brillante! Respuesta impecable. 🌟",
+        "¡Qué agilidad! Operación resuelta con éxito. 🎉",
+        "¡Genial! Así se domina el tablero matemático.",
+        "¡Increíble! Es una victoria absoluta."
+    ];
+    const frasesAnimo = [
+        "¡Casi se logra! Vamos a revisar el procedimiento paso a paso. 👍",
+        "No hay de qué preocuparse, los errores nos ayudan a aprender.",
+        "¡A mantener el entusiasmo! El próximo intento saldrá perfecto.",
+        "Un pequeño tropiezo, ¡pero la revancha viene ya!"
+    ];
+    const frasesConsejo = [
+        "💡 Consejo: Recuerda multiplicar primero las unidades a la derecha.",
+        "💡 Tip de selva: ¿Y si pruebas sumando ese mismo número varias veces?",
+        "💡 Ayuda: Revisa despacio la fila correspondiente en la tabla base.",
+        "💡 Recuerda: Si el resultado tiene dos dígitos, guarda las decenas arriba."
+    ];
+
+    function guardarProgresoEnDisco() {
+        const data = {
+            playerName: playerName,
+            coins: coins,
+            mascotaEquipadaIndex: mascotaEquipadaIndex,
+            unlockedStatus: pets.map(p => p.unlocked),
+            customNames: pets.map(p => p.customName)
+        };
+        localStorage.setItem('cti_selva_matematica_save', JSON.stringify(data));
+    }
+
+    function cargarProgresoDesdeDisco() {
+        try {
+            const raw = localStorage.getItem('cti_selva_matematica_save');
+            if (raw) {
+                const data = JSON.parse(raw);
+                playerName = data.playerName || "Estrella";
+                coins = data.coins || 0;
+                mascotaEquipadaIndex = data.mascotaEquipadaIndex || 0;
+                
+                if (data.unlockedStatus) {
+                    data.unlockedStatus.forEach((status, i) => { if(pets[i]) pets[i].unlocked = status; });
+                }
+                if (data.customNames) {
+                    data.customNames.forEach((name, i) => { if(pets[i]) pets[i].customName = name; });
+                }
+                
+                document.getElementById('hud-coins').innerText = coins;
+                document.getElementById('player-name-input').value = playerName;
+                equipPet(mascotaEquipadaIndex);
+            }
+        } catch(e) {
+            console.error("No se pudo cargar el archivo de guardado previo", e);
+        }
+    }
+
+    window.addEventListener('load', () => {
+        cargarProgresoDesdeDisco();
+    });
+
     function playSound(type) {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        osc.connect(gain); gain.connect(audioCtx.destination);
 
         if (type === 'correct') {
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
             osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
             gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.25);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.25);
         } else if (type === 'incorrect') {
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
             osc.frequency.setValueAtTime(90, audioCtx.currentTime + 0.15);
             gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
         } else if (type === 'win') {
             osc.type = 'sine';
             const notes = [523.25, 587.33, 659.25, 783.99, 880, 1046.50];
-            notes.forEach((f, i) => {
-                osc.frequency.setValueAtTime(f, audioCtx.currentTime + (i * 0.08));
-            });
+            notes.forEach((f, i) => osc.frequency.setValueAtTime(f, audioCtx.currentTime + (i * 0.08)));
             gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.6);
-        } else if (type === 'shop') {
-            osc.type = 'triangle';
-            const notes = [300, 400, 500, 600, 700, 800];
-            notes.forEach((f, i) => {
-                osc.frequency.setValueAtTime(f, audioCtx.currentTime + (i * 0.06));
-            });
+            osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+        } else if (type === 'fanfarria_premio') {
+            osc.type = 'sine';
+            const notasTriunfo = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+            notasTriunfo.forEach((f, i) => osc.frequency.setValueAtTime(f, audioCtx.currentTime + (i * 0.07)));
             gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.5);
+            osc.start(); osc.stop(audioCtx.currentTime + 1.0);
         }
+    }
+
+    function reaccionarAClicMascota() {
+        const txtBox = document.getElementById('burbuja-texto-asistente');
+        const fraseAleatoria = frasesConsejo[Math.floor(Math.random() * frasesConsejo.length)];
+        txtBox.innerText = fraseAleatoria;
+    }
+
+    function alimentarTextoAsistente(categoria) {
+        const container = document.getElementById('asistente-mascota-container');
+        const txtBox = document.getElementById('burbuja-texto-asistente');
+        const imgBox = document.getElementById('img-asistente-actual');
+        
+        imgBox.src = pets[mascotaEquipadaIndex].file;
+        let lista = [];
+        
+        if (categoria === 'felicidad') lista = frasesFelicidad;
+        else if (categoria === 'animo') lista = frasesAnimo;
+        else lista = ["¡Vamos adelante juntos! 🌿"];
+        
+        txtBox.innerText = lista[Math.floor(Math.random() * lista.length)];
+        container.classList.add('visible');
+    }
+
+    function ocultarAsistenteFlotante() {
+        document.getElementById('asistente-mascota-container').classList.remove('visible');
     }
 
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
+        
+        if (screenId === 'screen-quiz' || screenId === 'screen-practice-exercise') {
+            document.getElementById('img-asistente-actual').src = pets[mascotaEquipadaIndex].file;
+            document.getElementById('burbuja-texto-asistente').innerText = "¡Presiona sobre mí si necesitas un consejo! 🐾";
+            document.getElementById('asistente-mascota-container').classList.add('visible');
+        } else {
+            ocultarAsistenteFlotante();
+        }
     }
 
     function saveName() {
         const input = document.getElementById('player-name-input');
-        if (input.value.trim() !== "") {
-            playerName = input.value.trim();
-        }
-        
-        document.getElementById('welcome-message').innerText = `¡Hola, ${playerName}! 😊`;
+        if (input.value.trim() !== "") playerName = input.value.trim();
+        document.getElementById('welcome-message').innerText = `¡Te damos la bienvenida! 😊`;
+        guardarProgresoEnDisco();
         startGooeySequence();
     }
 
     function startGooeySequence() {
         showScreen('screen-gooey');
-
-        // Secuencia completamente neutra que integra el nombre del usuario
-        gooeyTextsArray = [
-            "de CTI",
-            playerName,
-            "Te damos la bienvenida",
-            "A la Selva",
-            "Mágica 🌿"
-        ];
-
+        gooeyTextsArray = ["¡De CTI!", playerName, "Te damos la bienvenida", "A la Selva", "Mágica 🌿"];
         text1Element = document.getElementById("text1");
         text2Element = document.getElementById("text2");
-
-        gooeyTextIndex = 0;
-        gooeyMorph = 0;
-        gooeyCooldown = gooeyCooldownTime;
-
+        gooeyTextIndex = 0; gooeyMorph = 0; gooeyCooldown = gooeyCooldownTime;
         text1Element.textContent = gooeyTextsArray[gooeyTextIndex];
         text2Element.textContent = gooeyTextsArray[(gooeyTextIndex + 1) % gooeyTextsArray.length];
-        
         gooeyTime = new Date();
         animateGooey();
     }
 
-    function setGooeyMorph(fraction) {
-        text2Element.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
-        text2Element.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
-
-        fraction = 1 - fraction;
-        text1Element.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
-        text1Element.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
-    }
-
-    function doGooeyCooldown() {
-        gooeyMorph = 0;
-        text2Element.style.filter = "";
-        text2Element.style.opacity = "100%";
-        text1Element.style.filter = "";
-        text1Element.style.opacity = "0%";
-    }
-
-    function doGooeyMorph() {
-        gooeyMorph -= gooeyCooldown;
-        gooeyCooldown = 0;
-        let fraction = gooeyMorph / gooeyMorphTime;
-
-        if (fraction > 1) {
-            gooeyCooldown = gooeyCooldownTime;
-            fraction = 1;
-        }
-        setGooeyMorph(fraction);
-    }
-
     function animateGooey() {
         gooeyAnimationId = requestAnimationFrame(animateGooey);
-
         const newTime = new Date();
         const shouldIncrementIndex = gooeyCooldown > 0;
         const dt = (newTime.getTime() - gooeyTime.getTime()) / 1000;
-
-        gooeyTime = newTime;
-        gooeyCooldown -= dt;
+        gooeyTime = newTime; gooeyCooldown -= dt;
 
         if (gooeyCooldown <= 0) {
             if (shouldIncrementIndex) {
                 if (gooeyTextIndex >= gooeyTextsArray.length - 1) {
                     cancelAnimationFrame(gooeyAnimationId);
-                    setTimeout(() => {
-                        showScreen('screen-mode');
-                    }, 800);
+                    setTimeout(() => showScreen('screen-mode'), 800);
                     return;
                 }
                 gooeyTextIndex++;
-
                 text1Element.textContent = gooeyTextsArray[gooeyTextIndex];
                 text2Element.textContent = gooeyTextsArray[(gooeyTextIndex + 1) % gooeyTextsArray.length];
             }
-            doGooeyMorph();
+            gooeyMorph -= gooeyCooldown; gooeyCooldown = 0;
+            let fraction = gooeyMorph / gooeyMorphTime;
+            if (fraction > 1) { gooeyCooldown = gooeyCooldownTime; fraction = 1; }
+            text2Element.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
+            text2Element.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
+            fraction = 1 - fraction;
+            text1Element.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
+            text1Element.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
         } else {
-            doGooeyCooldown();
+            gooeyMorph = 0;
+            text2Element.style.filter = ""; text2Element.style.opacity = "100%";
+            text1Element.style.filter = ""; text1Element.style.opacity = "0%";
         }
     }
 
     function selectMode(mode) {
-        gameMode = mode;
-        currentLevel = 1;
-        if (gameMode === 'adventure') {
-            showLevelIntroduction();
-        } else {
-            startSoloExercisesMode();
-        }
+        gameMode = mode; currentLevel = 1;
+        if (gameMode === 'adventure') showLevelIntroduction();
+        else startSoloExercisesMode();
     }
 
-    function triggerExit(currentScreenId) {
-        previousScreenBeforeExit = currentScreenId;
-        showScreen('screen-confirm-exit');
-    }
-
-    function confirmExit(yes) {
-        if (yes) {
-            goToMenu();
-        } else {
-            showScreen(previousScreenBeforeExit);
-        }
-    }
-
-    function goToMenu() {
-        showScreen('screen-mode');
-    }
+    function triggerExit(currentScreenId) { previousScreenBeforeExit = currentScreenId; showScreen('screen-confirm-exit'); }
+    function confirmExit(yes) { if (yes) goToMenu(); else showScreen(previousScreenBeforeExit); }
+    function goToMenu() { showScreen('screen-mode'); }
 
     function showLevelIntroduction() {
         document.getElementById('learn-title').innerText = `Nivel ${currentLevel}: ¡Aprendamos la Tabla del ${currentLevel}!`;
         const container = document.getElementById('study-table-container');
         container.innerHTML = '';
-
         for(let i = 1; i <= 10; i++) {
             const item = document.createElement('div');
             item.className = 'table-item';
@@ -956,27 +831,15 @@
 
     function generateQuestions() {
         questions = [];
-        let multipliers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        for (let i = multipliers.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [multipliers[i], multipliers[j]] = [multipliers[j], multipliers[i]];
-        }
+        let multipliers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].sort(() => Math.random() - 0.5);
         for (let i = 0; i < totalQuestionsPerLevel; i++) {
-            questions.push({
-                base: currentLevel,
-                multiplier: multipliers[i]
-            });
+            questions.push({ base: currentLevel, multiplier: multipliers[i] });
         }
     }
 
     function startQuiz() {
-        lives = 3;
-        currentQuestionIndex = 0;
-        generateQuestions();
-        updateStatusBar();
-        renderProgressDots();
-        showQuestion();
-        showScreen('screen-quiz');
+        lives = 3; currentQuestionIndex = 0;
+        generateQuestions(); updateStatusBar(); showQuestion(); showScreen('screen-quiz');
     }
 
     function updateStatusBar() {
@@ -984,46 +847,31 @@
         document.getElementById('info-lives').innerText = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
     }
 
-    function renderProgressDots() {
+    function showQuestion() {
+        canAnswer = true;
         const container = document.getElementById('progress-container');
         container.innerHTML = '';
         for(let i = 0; i < totalQuestionsPerLevel; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'dot';
+            const dot = document.createElement('div'); dot.className = 'dot';
             if(i < currentQuestionIndex) dot.classList.add('done');
             container.appendChild(dot);
         }
-    }
-
-    function showQuestion() {
-        canAnswer = true;
-        renderProgressDots();
         
         const q = questions[currentQuestionIndex];
         currentCorrectAnswer = q.base * q.multiplier;
-
         document.getElementById('current-operation').innerText = `${q.base} x ${q.multiplier} = ?`;
 
-        let options = new Set();
-        options.add(currentCorrectAnswer);
-
+        let options = new Set([currentCorrectAnswer]);
         while(options.size < 4) {
             let offset = (Math.floor(Math.random() * 3) + 1) * (Math.random() < 0.5 ? 1 : -1);
-            let fakeAns = currentCorrectAnswer + offset;
-            if(fakeAns > 0) {
-                options.add(fakeAns);
-            }
+            if(currentCorrectAnswer + offset > 0) options.add(currentCorrectAnswer + offset);
         }
-
-        let optionsArray = Array.from(options).sort(() => Math.random() - 0.5);
 
         const optionsContainer = document.getElementById('options-container');
         optionsContainer.innerHTML = '';
-        
-        optionsArray.forEach(opt => {
+        Array.from(options).sort(() => Math.random() - 0.5).forEach(opt => {
             const btn = document.createElement('button');
-            btn.className = 'options-btn';
-            btn.innerText = opt;
+            btn.className = 'option-btn'; btn.innerText = opt;
             btn.onclick = () => checkAnswer(opt, btn);
             optionsContainer.appendChild(btn);
         });
@@ -1036,55 +884,43 @@
         if (selected === currentCorrectAnswer) {
             buttonElement.classList.add('correct');
             playSound('correct');
+            alimentarTextoAsistente('felicidad');
             
             coins += 2;
             document.getElementById('hud-coins').innerText = coins;
+            guardarProgresoEnDisco();
             currentQuestionIndex++;
 
             setTimeout(() => {
-                if (currentQuestionIndex >= totalQuestionsPerLevel) {
-                    setupExplanationScreen();
-                } else {
-                    showQuestion();
-                }
-            }, 1000);
-
+                if (currentQuestionIndex >= totalQuestionsPerLevel) setupExplanationScreen();
+                else showQuestion();
+            }, 1400);
         } else {
             buttonElement.classList.add('incorrect');
             playSound('incorrect');
-            lives--;
-            updateStatusBar();
+            alimentarTextoAsistente('animo');
+            lives--; updateStatusBar();
 
             setTimeout(() => {
-                const buttons = document.querySelectorAll('.options-btn');
-                buttons.forEach(b => {
-                    if(parseInt(b.innerText) === currentCorrectAnswer) {
-                        b.classList.add('correct');
-                    }
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    if(parseInt(b.innerText) === currentCorrectAnswer) b.classList.add('correct');
                 });
             }, 300);
 
             setTimeout(() => {
-                if (lives <= 0) {
-                    document.getElementById('game-over-title').innerText = `¡Ánimo, ${playerName}!`;
-                    showScreen('screen-game-over');
-                } else {
+                if (lives <= 0) showScreen('screen-game-over');
+                else {
                     currentQuestionIndex++;
-                    if (currentQuestionIndex >= totalQuestionsPerLevel) {
-                        setupExplanationScreen();
-                    } else {
-                        showQuestion();
-                    }
+                    if (currentQuestionIndex >= totalQuestionsPerLevel) setupExplanationScreen();
+                    else showQuestion();
                 }
-            }, 1500);
+            }, 1800);
         }
     }
 
     function setupExplanationScreen() {
         explanationStep = 0;
-        
-        let possibleUnits = [4, 5, 6, 7, 8, 9];
-        let randUnits = possibleUnits[Math.floor(Math.random() * possibleUnits.length)];
+        let randUnits = [4, 5, 6, 7, 8, 9][Math.floor(Math.random() * 6)];
         let randTens = Math.floor(Math.random() * 4) + 2; 
         expNumA = parseInt(`${randTens}${randUnits}`);
         expNumB = currentLevel;
@@ -1095,22 +931,15 @@
         expFinalResult = expNumA * expNumB;
 
         document.getElementById('exit-btn-exp').style.visibility = 'visible';
-        document.getElementById('chalk-instructions').innerHTML = `¡Hola, ${playerName}! Vamos a aprender a hacer una multiplicación de varias cifras usando la tabla del <strong>${currentLevel}</strong>.<br><br>Presiona el botón amarillo para iniciar paso a paso.`;
+        document.getElementById('chalk-instructions').innerHTML = `¡Hola! Multipliquemos varias cifras usando la tabla del <strong>${currentLevel}</strong>.<br><br>Presiona el botón amarillo para iniciar paso a paso.`;
         
-        renderPizarraEstática();
-        
+        let tens = Math.floor(expNumA / 10); let units = expNumA % 10;
+        document.getElementById('vertical-math-problem').innerHTML = `&nbsp;<span>${tens}</span><span>${units}</span><br>x&nbsp;<span>${expNumB}</span>`;
         document.getElementById('vertical-math-result').innerText = '';
         document.getElementById('carry-display').innerText = '';
         document.getElementById('explanation-next-btn').style.display = 'inline-flex';
         document.getElementById('explanation-action-btn').style.display = 'none';
-
         showScreen('screen-explanation');
-    }
-
-    function renderPizarraEstática() {
-        let tens = Math.floor(expNumA / 10);
-        let units = expNumA % 10;
-        document.getElementById('vertical-math-problem').innerHTML = `&nbsp;<span>${tens}</span><span>${units}</span><br>x&nbsp;<span id="pizarra-mult-b">${expNumB}</span>`;
     }
 
     function advanceExplanation() {
@@ -1119,39 +948,28 @@
         const carryDisp = document.getElementById('carry-display');
         const problemDisp = document.getElementById('vertical-math-problem');
         const resultDisp = document.getElementById('vertical-math-result');
-
-        let tens = Math.floor(expNumA / 10);
-        let units = expNumA % 10;
+        let tens = Math.floor(expNumA / 10), units = expNumA % 10;
 
         if (explanationStep === 1) {
             let multVal = units * expNumB;
             inst.innerHTML = `<strong>Paso 1:</strong> Multiplicamos las unidades.<br>Multiplicamos <span style="color: #F1C40F;">${units} × ${expNumB} = ${multVal}</span>.<br><br>Escribimos el <strong>${expStep1Result}</strong> abajo y "nos llevamos" <strong>${expCarry}</strong> arriba de las decenas.`;
             problemDisp.innerHTML = `&nbsp;<span>${tens}</span><span class="highlight-num">${units}</span><br>x&nbsp;<span class="highlight-num">${expNumB}</span>`;
-            
-            if (expCarry > 0) {
-                carryDisp.innerText = expCarry;
-            }
+            if (expCarry > 0) carryDisp.innerText = expCarry;
             resultDisp.innerHTML = `<span class="highlight-num">${expStep1Result}</span>`;
             playSound('correct');
-
         } else if (explanationStep === 2) {
             let multVal = tens * expNumB;
             let finalTenResult = multVal + expCarry;
-            
-            inst.innerHTML = `<strong>Paso 2:</strong> Multiplicamos las decenas.<br>Multiplicamos <span style="color: #F1C40F;">${tens} × ${expNumB} = ${multVal}</span>.<br><br>Ahora le sumamos lo que "llevábamos" arriba:<br>${multVal} + ${expCarry} (llevados) = <strong>${finalTenResult}</strong>.`;
+            inst.innerHTML = `<strong>Paso 2:</strong> Multiplicamos las decenas.<br>Multiplicamos <span style="color: #F1C40F;">${tens} × ${expNumB} = ${multVal}</span>.<br><br>Sumamos lo que llevábamos arriba:<br>${multVal} + ${expCarry} = <strong>${finalTenResult}</strong>.`;
             carryDisp.innerHTML = `<span class="highlight-num">${expCarry}</span>`;
             problemDisp.innerHTML = `&nbsp;<span class="highlight-num">${tens}</span><span>${units}</span><br>x&nbsp;<span class="highlight-num">${expNumB}</span>`;
-            
             resultDisp.innerHTML = `<span class="highlight-num">${finalTenResult}</span><span>${expStep1Result}</span>`;
             playSound('correct');
-
         } else if (explanationStep === 3) {
             carryDisp.innerHTML = expCarry > 0 ? expCarry : "";
             problemDisp.innerHTML = `&nbsp;<span>${tens}</span><span>${units}</span><br>x&nbsp;<span>${expNumB}</span>`;
             resultDisp.innerHTML = `<span>${expFinalResult}</span>`;
-
-            inst.innerHTML = `<strong>¡Listo!</strong> El resultado de <br><strong>${expNumA} × ${expNumB}</strong> es igual a <span style="font-size: 1.5rem; color:#FFD700;"><strong>${expFinalResult}</strong></span>.<br><br>¡Excelente trabajo! Ahora te toca resolver un ejercicio de práctica.`;
-            
+            inst.innerHTML = `<strong>¡Listo!</strong> El resultado final es <span style="font-size: 1.5rem; color:#FFD700;"><strong>${expFinalResult}</strong></span>.<br><br>¡Excelente! Pasemos a resolver un ejercicio de forma directa en las casillas.`;
             document.getElementById('explanation-next-btn').style.display = 'none';
             document.getElementById('explanation-action-btn').style.display = 'inline-flex';
             playSound('win');
@@ -1160,26 +978,16 @@
 
     function goToPracticeExercise() {
         document.getElementById('practice-error-alert').style.display = 'none';
-
-        for(let i=0; i<4; i++) {
-            let box = document.getElementById('d'+i);
-            box.value = '';
-        }
-
+        for(let i=0; i<4; i++) document.getElementById('d'+i).value = '';
         document.getElementById('exit-btn-practice').style.visibility = 'visible';
 
-        let randUnits = Math.floor(Math.random() * 5) + 1; 
-        let randTens = Math.floor(Math.random() * 3) + 1;  
-        practiceNumA = parseInt(`${randTens}${randUnits}`);
+        practiceNumA = parseInt(`${Math.floor(Math.random() * 3) + 1}${Math.floor(Math.random() * 5) + 1}`);
         practiceNumB = currentLevel;
         practiceCorrectResult = practiceNumA * practiceNumB;
-
         document.getElementById('practice-layout').innerHTML = `&nbsp;${practiceNumA}<br>x&nbsp;${practiceNumB}`;
         
         let len = practiceCorrectResult.toString().length;
-        for(let i=0; i<4; i++) {
-            document.getElementById('d'+i).style.display = (i < len) ? "block" : "none";
-        }
+        for(let i=0; i<4; i++) document.getElementById('d'+i).style.display = (i < len) ? "block" : "none";
 
         showScreen('screen-practice-exercise');
         setTimeout(() => document.getElementById('d0').focus(), 150);
@@ -1190,9 +998,7 @@
         if(currentBox.value.length > 0) {
             currentBox.value = currentBox.value.slice(-1); 
             let nextBox = document.getElementById('d' + (index + 1));
-            if(nextBox && nextBox.style.display !== "none") {
-                nextBox.focus();
-            }
+            if(nextBox && nextBox.style.display !== "none") nextBox.focus();
         }
     }
 
@@ -1200,16 +1006,13 @@
         let userString = "";
         for(let i = 3; i >= 0; i--) {
             let val = document.getElementById('d' + i).value;
-            if(val !== "" && document.getElementById('d'+i).style.display !== "none") {
-                userString += val;
-            }
+            if(val !== "" && document.getElementById('d'+i).style.display !== "none") userString += val;
         }
-        
         const inputNum = parseInt(userString);
         const alertBox = document.getElementById('practice-error-alert');
 
         if (isNaN(inputNum)) {
-            alertBox.innerText = "⚠️ Por favor, escribe un resultado en las casillas antes de comprobar.";
+            alertBox.innerText = "⚠️ Por favor, rellena las casillas vacías antes de comprobar.";
             alertBox.style.display = 'block';
             return;
         }
@@ -1217,131 +1020,173 @@
         if (inputNum === practiceCorrectResult) {
             alertBox.style.display = 'none';
             playSound('win');
+            alimentarTextoAsistente('felicidad');
+            coins += 10;
+            document.getElementById('hud-coins').innerText = coins;
+            guardarProgresoEnDisco();
             
+            document.getElementById('win-level-title').innerText = "¡Nivel Superado! 🎉";
             if (gameMode === 'adventure') {
-                coins += 10;
-                document.getElementById('hud-coins').innerText = coins;
-                document.getElementById('win-level-title').innerText = `¡Excelente, ${playerName}! 🎉`;
                 document.getElementById('win-continue-btn').innerText = "Siguiente Nivel ➡️";
                 document.getElementById('win-continue-btn').onclick = nextLevel;
-                showScreen('screen-win-level');
             } else {
-                coins += 10;
-                document.getElementById('hud-coins').innerText = coins;
-                document.getElementById('win-level-title').innerText = `¡Lo lograste, ${playerName}! 🎉`;
-                const nextBtn = document.getElementById('win-continue-btn');
-                nextBtn.innerText = "Hacer otro ejercicio 📝";
-                nextBtn.onclick = function() { startSoloExercisesMode(); };
-                showScreen('screen-win-level');
+                document.getElementById('win-continue-btn').innerText = "Hacer otro ejercicio 📝";
+                document.getElementById('win-continue-btn').onclick = startSoloExercisesMode;
             }
+            setTimeout(() => showScreen('screen-win-level'), 600);
         } else {
             playSound('incorrect');
-            alertBox.innerHTML = `❌ ¡Casi lo logras, ${playerName}! El resultado correcto era <strong>${practiceCorrectResult}</strong>.<br>¡No hay problema! Vamos a intentar con otra operación para seguir mejorando. 💪`;
+            alimentarTextoAsistente('animo');
+            alertBox.innerHTML = `❌ El resultado correcto era <strong>${practiceCorrectResult}</strong>.<br>¡A seguir intentando para perfeccionar la técnica! Generando una nueva operación... 🔄`;
             alertBox.style.display = 'block';
-            
-            setTimeout(() => {
-                goToPracticeExercise();
-            }, 5000);
+            setTimeout(goToPracticeExercise, 4500);
         }
     }
 
     function showShop() {
-        document.getElementById('shop-alert').style.display = "none";
         const grid = document.getElementById('shop-grid');
         grid.innerHTML = "";
-
         let nextLockIndex = pets.findIndex(p => !p.unlocked);
 
         pets.forEach((pet, index) => {
-            let card = document.createElement('div');
-            card.className = "pet-card";
-
-            let nameLbl = document.createElement('div');
-            nameLbl.className = "pet-name-label";
-            nameLbl.innerText = pet.name;
-
-            let frame = document.createElement('div');
-            frame.className = "pet-avatar-frame";
+            let card = document.createElement('div'); card.className = "pet-card";
             
-            let img = document.createElement('img');
-            img.src = pet.file;
-            img.alt = pet.name;
-            img.className = "pet-img";
-            
-            if (!pet.unlocked) {
-                img.classList.add('pet-locked');
-            }
+            let displayName = pet.customName ? pet.customName : pet.name;
+            let nameLbl = document.createElement('div'); nameLbl.className = "pet-name-label"; nameLbl.innerText = displayName;
+
+            let frame = document.createElement('div'); frame.className = "pet-avatar-frame";
+            let img = document.createElement('img'); img.src = pet.file; img.className = "pet-img";
+            if (!pet.unlocked) img.classList.add('pet-locked');
             frame.appendChild(img);
 
             let btn = document.createElement('button');
             btn.style = "width: 100%; font-size: 0.9rem; margin: 5px 0; padding: 8px;";
 
             if(pet.unlocked) {
-                btn.innerText = "Elegir 🐾";
-                btn.className = "btn-success";
-                btn.onclick = () => equipPet(index);
+                btn.innerText = (index === mascotaEquipadaIndex) ? "Equipado ✅" : "Elegir 🐾";
+                btn.className = (index === mascotaEquipadaIndex) ? "btn-secondary" : "btn-success";
+                if (index !== mascotaEquipadaIndex) btn.onclick = () => equipPet(index);
             } else {
                 if(index === nextLockIndex) {
                     btn.innerText = `Comprar 💰${pet.cost}`;
                     if(coins >= pet.cost) {
-                        btn.className = "btn-warning";
-                        btn.onclick = () => buyPet(index);
+                        btn.className = "btn-warning"; btn.onclick = () => buyPet(index);
                     } else {
-                        btn.className = "btn-secondary";
-                        btn.style.cursor = "not-allowed";
+                        btn.className = "btn-secondary"; btn.style.cursor = "not-allowed";
                     }
                 } else {
-                    btn.innerText = "🔒 Bloqueado";
-                    btn.className = "btn-secondary";
-                    btn.style.cursor = "not-allowed";
+                    btn.innerText = "🔒 Secuencial"; btn.className = "btn-secondary"; btn.style.cursor = "not-allowed";
                 }
             }
-
-            card.append(nameLbl, frame, btn);
-            grid.appendChild(card);
+            card.append(nameLbl, frame, btn); grid.appendChild(card);
         });
-
         showScreen('screen-shop');
     }
 
     function buyPet(index) {
         coins -= pets[index].cost;
         pets[index].unlocked = true;
+        indiceMascotaRecienComprada = index; 
         document.getElementById('hud-coins').innerText = coins;
-        playSound('shop');
         
-        const alertBox = document.getElementById('shop-alert');
-        alertBox.style.display = "block";
-        alertBox.innerHTML = `<b>✨ ¡NUEVO COMPAÑERO DE AVENTURAS! ✨</b> ¡Has desbloqueado al tierno <strong>${pets[index].name}</strong>!`;
+        playSound('fanfarria_premio');
+        confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 } });
+        
+        document.getElementById('modal-premio-sub').innerHTML = `¡Excelente elección! Se ha sumado un nuevo miembro al grupo de exploración.`;
+        document.getElementById('modal-premio-img').src = pets[index].file;
+        
+        document.getElementById('sub-pantalla-recompensa').style.display = 'block';
+        document.getElementById('sub-pantalla-bautizo').style.display = 'none';
+        document.getElementById('input-nombre-mascota').value = '';
+        
+        document.getElementById('modal-premio-mascota').classList.add('mostrar');
+    }
 
-        equipPet(index);
+    function pasarABautizo() {
+        document.getElementById('sub-pantalla-recompensa').style.display = 'none';
+        document.getElementById('sub-pantalla-bautizo').style.display = 'block';
+        setTimeout(() => document.getElementById('input-nombre-mascota').focus(), 200);
+    }
+
+    function guardarNombreMascota() {
+        const inputNombre = document.getElementById('input-nombre-mascota').value.trim();
+        if(indiceMascotaRecienComprada !== null) {
+            if(inputNombre !== "") {
+                pets[indiceMascotaRecienComprada].customName = inputNombre;
+            }
+            equipPet(indiceMascotaRecienComprada);
+        }
+        cerrarModalPremio();
+    }
+
+    function cerrarModalPremio() {
+        document.getElementById('modal-premio-mascota').classList.remove('mostrar');
+        indiceMascotaRecienComprada = null;
+        guardarProgresoEnDisco();
         showShop();
     }
 
-    function equipPet(index) {
-        document.getElementById('hud-pet-name').innerText = "Mascota: " + pets[index].name;
-        document.getElementById('hud-pet-icon').src = pets[index].file;
+function showShop() {
+        const grid = document.getElementById('shop-grid');
+        grid.innerHTML = "";
+        let nextLockIndex = pets.findIndex(p => !p.unlocked);
+
+        pets.forEach((pet, index) => {
+            let card = document.createElement('div'); card.className = "pet-card";
+            
+            let displayName = pet.customName ? pet.customName : pet.name;
+            let nameLbl = document.createElement('div'); nameLbl.className = "pet-name-label"; nameLbl.innerText = displayName;
+
+            let frame = document.createElement('div'); frame.className = "pet-avatar-frame";
+            let img = document.createElement('img'); img.src = pet.file; img.className = "pet-img";
+            if (!pet.unlocked) img.classList.add('pet-locked');
+            frame.appendChild(img);
+
+            let btn = document.createElement('button');
+            btn.style = "width: 100%; font-size: 0.9rem; margin: 5px 0; padding: 8px;";
+
+            if(pet.unlocked) {
+                // Aquí se evalúa dinámicamente cuál está equipada en el momento exacto de dibujar la tienda
+                btn.innerText = (index === mascotaEquipadaIndex) ? "Equipado ✅" : "Elegir 🐾";
+                btn.className = (index === mascotaEquipadaIndex) ? "btn-secondary" : "btn-success";
+                if (index !== mascotaEquipadaIndex) btn.onclick = () => equipPet(index);
+            } else {
+                if(index === nextLockIndex) {
+                    btn.innerText = `Comprar 💰${pet.cost}`;
+                    if(coins >= pet.cost) {
+                        btn.className = "btn-warning"; btn.onclick = () => buyPet(index);
+                    } else {
+                        btn.className = "btn-secondary"; btn.style.cursor = "not-allowed";
+                    }
+                } else {
+                    btn.innerText = "🔒 Secuencial"; btn.className = "btn-secondary"; btn.style.cursor = "not-allowed";
+                }
+            }
+            card.append(nameLbl, frame, btn); grid.appendChild(card);
+        });
+        showScreen('screen-shop');
     }
 
-    function nextLevel() {
-        if (currentLevel < 10) {
-            currentLevel++;
-            showLevelIntroduction();
-        } else {
-            document.getElementById('victory-title').innerText = `🏆 ¡ESTRELLA DE LAS MULTIPLICACIONES, ${playerName}! 👑`;
-            showScreen('screen-victory');
+    function equipPet(index) {
+        mascotaEquipadaIndex = index;
+        let p = pets[index];
+        let tag = p.customName ? p.customName : p.name;
+        document.getElementById('hud-pet-name').innerText = "Mascota: " + tag;
+        document.getElementById('hud-pet-icon').src = p.file;
+        guardarProgresoEnDisco();
+        
+        // ¡ESTA ES LA LÍNEA CLAVE! Refresca la tienda para cambiar los estados de los botones al instante
+        if (document.getElementById('screen-shop').classList.contains('active')) {
+            showShop();
         }
     }
-
-    function retryLevel() {
-        showLevelIntroduction();
+    function nextLevel() {
+        if (currentLevel < 10) { currentLevel++; showLevelIntroduction(); }
+        else showScreen('screen-victory');
     }
 
-    function resetToFirstLevel() {
-        currentLevel = 1;
-        showLevelIntroduction();
-    }
+    function retryLevel() { showLevelIntroduction(); }
+    function resetToFirstLevel() { currentLevel = 1; showLevelIntroduction(); }
 </script>
-
 </body>
 </html>
