@@ -5,6 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multiplica con CTI - ¡Selva Mágica!</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Configuración pública y segura de Firebase para el Ranking (CTI Educativo Base)
+        const firebaseConfig = {
+            databaseURL: "https://cti-edugame-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Hacer las funciones accesibles globalmente para el juego
+        window.guardarPuntajeNube = function(nombre, monedas) {
+            if(!nombre || nombre === "Estrella") return;
+            const userRef = ref(db, 'ranking/' + nombre.replace(/[.#$/\[\]]/g, "_"));
+            set(userRef, { nombre: nombre, monedas: monedas, fecha: Date.now() });
+        };
+
+        window.cargarRankingNube = function() {
+            const rankingRef = ref(db, 'ranking');
+            const consulta = query(rankingRef, orderByChild('monedas'), limitToLast(10));
+            
+            get(consulta).then((snapshot) => {
+                const lista = [];
+                snapshot.forEach((childSnapshot) => {
+                    lista.push(childSnapshot.val());
+                });
+                lista.reverse(); // Mayor a menor
+                
+                const tabla = document.getElementById('tabla-ranking-cuerpo');
+                if(!tabla) return;
+                tabla.innerHTML = "";
+                
+                if(lista.length === 0) {
+                    tabla.innerHTML = "<tr><td colspan='3'>¡Sé el primero en aparecer aquí! 🏆</td></tr>";
+                    return;
+                }
+
+                lista.forEach((jugador, index) => {
+                    const fila = document.createElement('tr');
+                    let medalla = index + 1;
+                    if(index === 0) medalla = "🥇";
+                    if(index === 1) medalla = "🥈";
+                    if(index === 2) medalla = "🥉";
+                    
+                    fila.innerHTML = `
+                        <td style="font-weight:bold;">${medalla}</td>
+                        <td>${jugador.nombre}</td>
+                        <td style="color:var(--oro); font-weight:bold;">💰 ${jugador.monedas}</td>
+                    `;
+                    tabla.appendChild(fila);
+                });
+            }).catch((error) => {
+                console.error("Error al cargar ranking: ", error);
+            });
+        };
+    </script>
+
     <style>
         :root {
             --primary: #4A90E2;
@@ -286,6 +345,13 @@
         .pet-locked { filter: brightness(0) opacity(0.75); }
         .pet-name-label { font-weight: bold; color: var(--dark); margin-bottom: 8px; }
 
+        /* Estilos de la tabla de posiciones */
+        .ranking-table { width: 100%; border-collapse: collapse; margin: 15px 0; background: var(--light); border-radius: 15px; overflow: hidden; border: 2px solid #e2e8f0; }
+        .ranking-table th { background: var(--primary); color: white; padding: 12px; font-size: 1.1rem; }
+        .ranking-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem; color: var(--dark); }
+        .ranking-table tr:last-child td { border-bottom: none; }
+        .ranking-table tr:nth-child(even) { background: #f8fafc; }
+
         .modal-recompensa-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -321,11 +387,7 @@
             overflow: hidden; 
             position: relative;
         }
-        .img-premio {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-        }
+        .img-premio { width: 100%; height: 100%; object-fit: cover; }
 
         #asistente-mascota-container {
             position: fixed;
@@ -383,7 +445,6 @@
         }
         .avatar-asistente img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* REESTRUCTURACIÓN Y CORRECCIÓN TOTAL DE LA ALINEACIÓN DEL EFECTO GOOEY */
         #gooey-screen { 
             background: transparent; 
             min-height: 250px; 
@@ -409,9 +470,7 @@
             color: var(--verde-selva); 
             width: 100%; 
             text-align: center; 
-            left: 0;
-            right: 0;
-            margin: 0 auto;
+            left: 0; right: 0; margin: 0 auto;
             display: inline-block;
         }
         .footer-brand { font-size: 0.8rem; color: #94a3b8; margin-top: 15px; text-align: center; font-style: italic; letter-spacing: 1px; }
@@ -485,16 +544,38 @@
             <p>Elige cómo quieres practicar hoy:</p>
             <div class="mode-card" onclick="selectMode('adventure')">
                 <h3 style="margin: 0; color: var(--success); font-size: 1.4rem;">🌈 Modo Aventura</h3>
-                <p style="margin: 5px 0 0 0; font-size: 1rem;">Estudia las tablas paso a paso (del 1 al 10), resuelve desafíos y gana copas.</p>
+                <p style="margin: 5px 0 0 0; font-size: 1rem;">Estudia las tablas paso a paso, resuelve desafíos y gana copas.</p>
             </div>
             <div class="mode-card" onclick="selectMode('exercises')">
                 <h3 style="margin: 0; color: var(--primary); font-size: 1.4rem;">⚡ Solo Ejercicios</h3>
                 <p style="margin: 5px 0 0 0; font-size: 1rem;">Pon a prueba tu agilidad resolviendo multiplicaciones directo por casillas.</p>
             </div>
-            <div class="mode-card" onclick="showShop()" style="border-color: var(--warning);">
+            <div class="mode-card" onclick="showShop()" style="border-color: var(--warning); margin-bottom: 5px;">
                 <h3 style="margin: 0; color: #D68910; font-size: 1.4rem;">🛒 Tienda de Mascotas Mágicas</h3>
-                <p style="margin: 5px 0 0 0; font-size: 1rem;">¡Usa tus monedas ganadas para desbloquear increíbles compañeros de selva!</p>
             </div>
+            <div class="mode-card" onclick="mostrarPantallaRanking()" style="border-color: #9b59b6; background: #faf5ff;">
+                <h3 style="margin: 0; color: #8e44ad; font-size: 1.4rem;">🏆 Tabla de Posiciones de la Clase</h3>
+                <p style="margin: 5px 0 0 0; font-size: 1rem;">Mira quiénes son los mejores exploradores de la selva en tiempo real.</p>
+            </div>
+        </div>
+
+        <div id="screen-ranking" class="screen">
+            <div class="exit-container"><button class="btn-exit" onclick="goToMenu()">🏠 Menú</button></div>
+            <h1>🏆 Cuadro de Honor 🌟</h1>
+            <p>Top 10 de alumnos con más monedas acumuladas:</p>
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Puesto</th>
+                        <th>Nombre del Alumno</th>
+                        <th style="width: 35%;">Monedas</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-ranking-cuerpo">
+                    <tr><td colspan="3">Cargando puntuaciones de la nube... ⏳</td></tr>
+                </tbody>
+            </table>
+            <button class="btn-primary" onclick="goToMenu()">¡Volver a Jugar! 🎮</button>
         </div>
 
         <div id="screen-confirm-exit" class="screen">
@@ -606,7 +687,6 @@
     ];
 
     let indiceMascotaRecienComprada = null;
-
     let explanationStep = 0;
     let expNumA = 24, expNumB = 3, expCarry = 0, expStep1Result = 0, expFinalResult = 0;
     let practiceNumA = 0, practiceNumB = 0, practiceCorrectResult = 0;
@@ -646,6 +726,11 @@
             customNames: pets.map(p => p.customName)
         };
         localStorage.setItem('cti_selva_matematica_save', JSON.stringify(data));
+        
+        // Sincroniza dinámicamente con la nube si la función ya fue cargada
+        if(typeof window.guardarPuntajeNube === 'function') {
+            window.guardarPuntajeNube(playerName, coins);
+        }
     }
 
     function cargarProgresoDesdeDisco() {
@@ -711,8 +796,7 @@
 
     function reaccionarAClicMascota() {
         const txtBox = document.getElementById('burbuja-texto-asistente');
-        const fraseAleatoria = frasesConsejo[Math.floor(Math.random() * frasesConsejo.length)];
-        txtBox.innerText = fraseAleatoria;
+        txtBox.innerText = frasesConsejo[Math.floor(Math.random() * frasesConsejo.length)];
     }
 
     function alimentarTextoAsistente(categoria) {
@@ -758,7 +842,7 @@
 
     function startGooeySequence() {
         showScreen('screen-gooey');
-        gooeyTextsArray = ["¡De CTI!", playerName, "Te damos la bienvenida", "A la Selva", "Mágica 🌿"];
+        gooeyTextsArray = ["De CTI", playerName, "Te damos la bienvenida", "A la Selva", "Mágica 🌿"];
         text1Element = document.getElementById("text1");
         text2Element = document.getElementById("text2");
         gooeyTextIndex = 0; gooeyMorph = 0; gooeyCooldown = gooeyCooldownTime;
@@ -805,6 +889,13 @@
         gameMode = mode; currentLevel = 1;
         if (gameMode === 'adventure') showLevelIntroduction();
         else startSoloExercisesMode();
+    }
+
+    function mostrarPantallaRanking() {
+        showScreen('screen-ranking');
+        if(typeof window.cargarRankingNube === 'function') {
+            window.cargarRankingNube();
+        }
     }
 
     function triggerExit(currentScreenId) { previousScreenBeforeExit = currentScreenId; showScreen('screen-confirm-exit'); }
@@ -1111,9 +1202,7 @@
     function guardarNombreMascota() {
         const inputNombre = document.getElementById('input-nombre-mascota').value.trim();
         if(indiceMascotaRecienComprada !== null) {
-            if(inputNombre !== "") {
-                pets[indiceMascotaRecienComprada].customName = inputNombre;
-            }
+            if(inputNombre !== "") pets[indiceMascotaRecienComprada].customName = inputNombre;
             equipPet(indiceMascotaRecienComprada);
         }
         cerrarModalPremio();
@@ -1126,47 +1215,6 @@
         showShop();
     }
 
-function showShop() {
-        const grid = document.getElementById('shop-grid');
-        grid.innerHTML = "";
-        let nextLockIndex = pets.findIndex(p => !p.unlocked);
-
-        pets.forEach((pet, index) => {
-            let card = document.createElement('div'); card.className = "pet-card";
-            
-            let displayName = pet.customName ? pet.customName : pet.name;
-            let nameLbl = document.createElement('div'); nameLbl.className = "pet-name-label"; nameLbl.innerText = displayName;
-
-            let frame = document.createElement('div'); frame.className = "pet-avatar-frame";
-            let img = document.createElement('img'); img.src = pet.file; img.className = "pet-img";
-            if (!pet.unlocked) img.classList.add('pet-locked');
-            frame.appendChild(img);
-
-            let btn = document.createElement('button');
-            btn.style = "width: 100%; font-size: 0.9rem; margin: 5px 0; padding: 8px;";
-
-            if(pet.unlocked) {
-                // Aquí se evalúa dinámicamente cuál está equipada en el momento exacto de dibujar la tienda
-                btn.innerText = (index === mascotaEquipadaIndex) ? "Equipado ✅" : "Elegir 🐾";
-                btn.className = (index === mascotaEquipadaIndex) ? "btn-secondary" : "btn-success";
-                if (index !== mascotaEquipadaIndex) btn.onclick = () => equipPet(index);
-            } else {
-                if(index === nextLockIndex) {
-                    btn.innerText = `Comprar 💰${pet.cost}`;
-                    if(coins >= pet.cost) {
-                        btn.className = "btn-warning"; btn.onclick = () => buyPet(index);
-                    } else {
-                        btn.className = "btn-secondary"; btn.style.cursor = "not-allowed";
-                    }
-                } else {
-                    btn.innerText = "🔒 Secuencial"; btn.className = "btn-secondary"; btn.style.cursor = "not-allowed";
-                }
-            }
-            card.append(nameLbl, frame, btn); grid.appendChild(card);
-        });
-        showScreen('screen-shop');
-    }
-
     function equipPet(index) {
         mascotaEquipadaIndex = index;
         let p = pets[index];
@@ -1175,11 +1223,11 @@ function showShop() {
         document.getElementById('hud-pet-icon').src = p.file;
         guardarProgresoEnDisco();
         
-        // ¡ESTA ES LA LÍNEA CLAVE! Refresca la tienda para cambiar los estados de los botones al instante
         if (document.getElementById('screen-shop').classList.contains('active')) {
             showShop();
         }
     }
+
     function nextLevel() {
         if (currentLevel < 10) { currentLevel++; showLevelIntroduction(); }
         else showScreen('screen-victory');
